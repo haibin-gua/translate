@@ -8,8 +8,6 @@ import './assets/reset.css'
 import axios from 'axios'
 import md5 from 'md5'
 import Vuejsonp from 'vue-jsonp'
-import $ from 'jquery'
-
 
 Vue.use(Vuejsonp)
 Vue.prototype.$md5 = md5
