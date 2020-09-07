@@ -9,8 +9,8 @@
           <div class="nav-r">清除历史纪录</div>
       </div>
       <div class="list">
-          <ul v-for="(item,index) of translist" :key="index">
-              <li>
+          <ul>
+              <li  v-for="(item,index) of translist" :key="index">
                   <div class="hd">{{item.notranslate}} → {{item.translate}}</div>
                   <div class="bd">
                       <p>{{item.txt}}</p>
@@ -46,20 +46,6 @@ export default {
             this.translist.push(this.translist[0])
             // console.log(this.translist[0])
        }
-        
-        // var keylen = sessionStorage.length
-        // var tranlist = new Array
-        // for(var i=0;i<keylen;i++){
-        //     tranlist.push(JSON.parse(sessionStorage.getItem(i)))
-        //     console.log(tranlist[i])
-        //     this.translist.push({notranslate:'',translate:''})
-        //     console.log(this.translist.length)
-        //     this.translist.notranslate = tranlist[i].notranslate
-        //     this.translist.translate = tranlist[i].translate
-        //     console.log(this.translist.notranslate)
-        //     console.log(this.translist.translate)
-        //     console.log(this.translist)
-        // }
     }
 }
 </script>

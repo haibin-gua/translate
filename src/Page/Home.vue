@@ -22,21 +22,42 @@
             </div>
           </form>
       </div>
-      <div class="hist" @click="isshow">
+      <div class="hist-btn" @click="isshow">
           <div class="img"><img src="../../static/images/历史纪录.png"/></div>
           <h2>历史纪录</h2>
       </div>
   </div>
-  <home-hist :hide="hide"></home-hist>
+  <!-- <home-hist :hide="hide"></home-hist> -->
+  <div class="hist" v-if="hide">
+      <div class="header">
+          <div class="hd-l">历史纪录</div>
+          <div class="hd-r" @click="isshow2"><img src="../../static/images/icon_close.png"/></div>
+      </div>
+      <div class="nav">
+          <div class="nav-l">1条翻译</div>
+          <div class="nav-r" @click="remove">清除历史纪录</div>
+      </div>
+      <div class="list" v-if="clear">
+          <ul>
+              <li v-for="(item,index) of translist" :key="index">
+                  <div class="hd">{{item.notranslate}} → {{item.translate}}</div>
+                  <div class="bd">
+                      <p>{{item.text}}</p>
+                      <p>{{item.trantext}}</p>
+                  </div>
+              </li>
+          </ul>
+      </div>
+  </div>
 </div>  
 </template>
 
 <script>
-import HomeHist from '../Page/components/HomeHist'
+// import HomeHist from '../Page/components/HomeHist'
 export default {
-    components:{
-        HomeHist
-    },
+    // components:{
+    //     HomeHist
+    // },
     data(){
         return{
             hide:false,
@@ -45,9 +66,11 @@ export default {
             transtext:'',
             left:'auto',
             right:'zh',
-            txt:'',
-            txt2:'',
+            txt:'中文',
+            txt2:'自动检测',
             index:'',
+            clear:true,
+            translist : [],
             languages:[
                 {id:'自动检测',value:'auto'},
                 {id:'粤语',value:"yue"},
@@ -130,12 +153,20 @@ export default {
     //         console.log(res)
     //     })
     // },
+    mounted() {
+       var keylen = sessionStorage.length
+       for(var i=0;i<keylen;i++){
+            this.translist[i] = JSON.parse(sessionStorage.getItem(i))
+       } 
+       console.log(this.translist)   
+    },
     watch:{
         text:{
-            handler(){
+            async handler(){
                 if(this.text.length > 0){
                         this.$jsonp('http://api.fanyi.baidu.com/api/trans/vip/translate?'+this.data).then(res=>{
-                        // console.log(res)
+                        // console.log(res.trans_result['0'].dst)
+                        // console.log(res.trans_result[0].dst)
                         this.transtext = res.trans_result[0].dst
                         // 存储值：将对象转换为Json字符串
                         this.index = sessionStorage.length
@@ -146,6 +177,10 @@ export default {
                             trantext:this.transtext
                         }
                         sessionStorage.setItem(this.index, JSON.stringify(trans));
+                         var keylen = sessionStorage.length
+                        for(var i=0;i<keylen;i++){
+                                this.translist[i] = JSON.parse(sessionStorage.getItem(i))
+                        }    
                     })
                 }
             }
@@ -175,6 +210,8 @@ export default {
                  case 'cht':this.txt = '繁体中文'
                 break;
                  case 'zh':this.txt = '中文'
+                break;
+                 case 'pt':this.txt = '葡萄牙语'
                 break;
                  case 'wyw':this.txt = '文言文'
                 break;
@@ -217,8 +254,6 @@ export default {
             this.right = this.$refs.newText2.value;
             console.log(this.right)
             switch(this.right){
-                case 'auto':this.txt2 = '自动检测'
-                break;
                  case 'yue':this.txt2 = '粤语'
                 break;
                  case 'kor':this.txt2 = '韩语'
@@ -238,6 +273,8 @@ export default {
                  case 'zh':this.txt2 = '中文'
                 break;
                  case 'wyw':this.txt2 = '文言文'
+                break;
+                 case 'pt':this.txt = '葡萄牙语'
                 break;
                  case 'ara':this.txt2 = '阿拉伯语'
                 break;
@@ -274,8 +311,19 @@ export default {
             }
             console.log(this.txt2)
         },
-        isshow:function(takehide){
-            this.hide = takehide
+        isshow(){
+            this.hide = true
+        },
+        isshow2(){
+            this.hide = false
+        },
+        remove(){
+            sessionStorage.clear()
+             var keylen = sessionStorage.length
+                for(var i=0;i<keylen;i++){
+                    this.translist[i] = JSON.parse(sessionStorage.getItem(i))
+                }
+            this.clear = false
         }
     }
 }
@@ -340,18 +388,75 @@ export default {
         margin-right: 10px;
         margin-top:0;
     }
-    .hist{
+    .hist-btn{
         margin-top:30px;
         cursor: pointer;
     }
-    .hist .img{
+    .hist-btn .img{
         width:64px;
         height:64px;
         margin:0 auto;
     }
-    .hist h2{
+    .hist-btn h2{
         text-align: center;
         font-size: 30px;
         color: #333;
+    }
+    .hist{
+        width:400px;
+        box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 10px;
+        position: fixed;
+        top:0;
+        right: 0;
+        z-index: 99999999;
+        background: #ffffff;
+        height: 100%;
+    }
+    .hist .header{
+        height:50px;
+        padding:0 10px;
+        border-bottom: 1px solid gray;
+    }
+    .hist .hd-l{
+        float: left;
+        line-height: 50px;
+        font-size: 36px;
+    }
+    .hist .hd-r{
+        float: right;
+        margin-top:10px;
+        cursor: pointer;
+    }
+    .hist .nav{
+        height:30px;
+        line-height: 30px;
+        padding:0 10px;
+        border-bottom:1px solid gray;
+    }
+    .hist .nav-l{
+        float: left;
+        font-size: 14px;
+        color: #333;
+    }
+    .hist .nav-r{
+        float: right;
+        font-size: 14px;
+        color: #333;
+        cursor: pointer;
+    }
+    .hist .list{
+        padding:0 10px;
+        padding-top:20px;
+    }
+    .hist .list .hd{
+        font-size: 12px;
+    }
+    .hist .list .bd{
+        margin-top:15px;
+    }
+    .hist .list .bd p{
+        font-size: 16px;
+        color: #333;
+        line-height: 1.8;
     }
 </style>
